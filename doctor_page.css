@@ -1,0 +1,53 @@
+body {
+    display: flex;
+}
+.main {
+    flex-grow: 1;
+}
+
+.user_block {
+    border-left: 2px solid gainsboro;
+    width:500px;
+    height: 100vh;
+}
+
+.user_scan {
+    margin-top:0px;
+    padding: 20px;
+    padding-top: 10px;
+    border-bottom: 2px solid gainsboro;
+}
+
+h3 {
+    margin:10px;
+}
+
+#image {
+    align-self: center;
+    margin:auto;
+    margin-bottom: 10px;
+    width: 50%;
+    height: auto;
+    display: block;
+}
+
+.user_info {
+    padding:20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-bottom: 2px solid gainsboro;
+}
+p {
+    margin:0px;
+    margin-bottom: 5px;
+}
+input[type='text'] {
+    margin:20px;
+}
+button {
+    display: block;
+    margin: 10px;
+    margin-left:200px;
+    width: 100px;
+}
