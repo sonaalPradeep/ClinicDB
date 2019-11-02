@@ -38,7 +38,7 @@
             }
         }
 
-        $sql2 = "SELECT * FROM visit WHERE pID = $id ORDER BY DandT DESC LIMIT 5";
+        $sql2 = "SELECT V.DandT, D.firstName, dn.DocNotes FROM ((visit V INNER JOIN doctor D ON D.doctorID = V.docID) INNER JOIN diagnosis dn ON dn.visID = V.visitID) WHERE V.pID = $id ORDER BY DandT DESC LIMIT 5";
         $result2 = mysqli_query($conn, $sql2);
         $past_visits = array();
 
@@ -137,35 +137,36 @@
         </div>
 
         <div class="user_history">
-            Last 5 Visits
+            <u>Last 5 Visits | Doctor Name | Diagnosis</u>
             <!-- Improvised coding, please consider formating and break testing -->
+            <!-- Need to remove extra "|"'s if total number of visits is less than 5' -->
             <p>
             <?=
-                $past_visits[0]['DandT'];
+                $past_visits[0]['DandT']." | ".$past_visits[0]['firstName']." | ".$past_visits[0]['DocNotes'];
             ?> 
             </p>
 
             <p>
             <?=
-                $past_visits[1]['DandT'];
+                $past_visits[1]['DandT']." | ".$past_visits[1]['firstName']." | ".$past_visits[1]['DocNotes'];
             ?> 
             </p>
 
             <p>
             <?=
-                $past_visits[2]['DandT'];
+                $past_visits[2]['DandT']." | ".$past_visits[2]['firstName']." | ".$past_visits[2]['DocNotes'];
             ?> 
             </p>
 
             <p>
             <?=
-                $past_visits[3]['DandT'];
+                $past_visits[3]['DandT']." | ".$past_visits[3]['firstName']." | ".$past_visits[3]['DocNotes'];
             ?> 
             </p>
 
             <p>
             <?=
-                $past_visits[4]['DandT'];
+                $past_visits[4]['DandT']." | ".$past_visits[4]['firstName']." | ".$past_visits[4]['DocNotes'];
             ?> 
             </p>
 
