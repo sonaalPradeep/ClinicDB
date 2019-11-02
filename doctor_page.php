@@ -37,6 +37,17 @@
                 $patient = $row;
             }
         }
+
+        $sql2 = "SELECT * FROM visit WHERE pID = $id ORDER BY DandT DESC LIMIT 5";
+        $result2 = mysqli_query($conn, $sql2);
+        $past_visits = array();
+
+        if(mysqli_num_rows($result2) > 0) {
+            while($row = mysqli_fetch_assoc($result2)) {
+                array_push($past_visits, $row);
+            }
+        }
+
         $conn->close();
 
         // $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
@@ -124,6 +135,42 @@
             ?>
             </p>
         </div>
+
+        <div class="user_history">
+            Last 5 Visits
+            <!-- Improvised coding, please consider formating and break testing -->
+            <p>
+            <?=
+                $past_visits[0]['DandT'];
+            ?> 
+            </p>
+
+            <p>
+            <?=
+                $past_visits[1]['DandT'];
+            ?> 
+            </p>
+
+            <p>
+            <?=
+                $past_visits[2]['DandT'];
+            ?> 
+            </p>
+
+            <p>
+            <?=
+                $past_visits[3]['DandT'];
+            ?> 
+            </p>
+
+            <p>
+            <?=
+                $past_visits[4]['DandT'];
+            ?> 
+            </p>
+
+        </div>
+
         <?php
             endif;
         ?>
