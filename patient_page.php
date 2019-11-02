@@ -6,7 +6,7 @@
 
 <html>
 <head>
-	<title>Patient</title>
+	<title>Patient Page</title>
 	<link rel = "stylesheet" type = "text/css" href = "patient_page.css">
 </head>
 
@@ -39,6 +39,16 @@
 
 		}
 
+		$sql2 = "SELECT V.DandT, D.firstName, dn.DocNotes from ((visit V INNER JOIN doctor D ON V.docID = D.doctorID) INNER JOIN diagnosis dn ON V.visitID = dn.visID) WHERE pID = $id";
+		$result2 = mysqli_query($conn, $sql2);
+		$past_visits = array();
+
+		if(mysqli_num_rows($result2) > 0) {
+			while($row = mysqli_fetch_assoc($result2)) {
+				array_push($past_visits, $row);
+			}
+		}
+
 		$conn->close();
 	}
 ?>
@@ -46,6 +56,21 @@
 <body>
 	<div class = "main">
 		<h1> WELCOME PATIENT </h1>
+
+		<div class = "patient_listing">
+			<h3> List of all diagnosis in descending order of visit </h3>
+
+			<?php  
+			$len = count($past_visits);
+			$i = 0;
+        	for($i = 0; $i < $len; $i++) {
+            	echo $past_visits[$i]["DandT"]." | ".$past_visits[$i]["firstName"]." | ".$past_visits[$i]["DocNotes"]."<br>";
+        	}
+
+			?>
+
+		</div>
+
 	</div>
 
 	<div class = 'user_block'>
