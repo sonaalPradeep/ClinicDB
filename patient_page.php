@@ -39,7 +39,8 @@
 
 		}
 
-		$sql2 = "SELECT V.DandT, D.firstName, dn.DocNotes from ((visit V INNER JOIN doctor D ON V.docID = D.doctorID) INNER JOIN diagnosis dn ON V.visitID = dn.visID) WHERE pID = $id";
+		// Need to try to include ISNULL function to show if no medicines were given ISNULL(vpm.medicineName, 'N/A')
+		$sql2 = "SELECT V.DandT, D.firstName, dn.DocNotes, vpm.medicineName FROM (((visit V INNER JOIN doctor D ON V.docID = D.doctorID) INNER JOIN diagnosis dn ON V.visitID = dn.visID) LEFT JOIN view_presc_med vpm ON vpm.visitID = V.visitID) WHERE V.pID = $id ORDER BY DandT DESC";
 		$result2 = mysqli_query($conn, $sql2);
 		$past_visits = array();
 
@@ -49,25 +50,47 @@
 			}
 		}
 
+		$sql3 = "SELECT V.DandT, t.testName FROM ((VISIT V INNER JOIN visitAndTest vat ON V.visitID = vat.visID) INNER JOIN test t ON t.testID = vat.testID)) WHERE V.pID = $id ORDER BY DandT DESC";
+		$result3 = mysqli_query($conn, $sql3);
+		$tests_cond = array();
+
+		if(mysqli_num_rows($result3) > 0) {
+			while($row = mysqli_fetch_assoc($result3)) {
+				array_push($tests_cond, $row);
+			}
+		}
+
+
+
 		$conn->close();
 	}
 ?>
 
 <body>
 	<div class = "main">
-		<h1> WELCOME PATIENT </h1>
+		<h1> Welcome to the Health Centre </h1>
 
 		<div class = "patient_listing">
 			<h3> List of all diagnosis in descending order of visit </h3>
 
 			<?php  
-			$len = count($past_visits);
-			$i = 0;
-        	for($i = 0; $i < $len; $i++) {
-            	echo $past_visits[$i]["DandT"]." | ".$past_visits[$i]["firstName"]." | ".$past_visits[$i]["DocNotes"]."<br>";
-        	}
-
+				$len = count($past_visits);
+				$i = 0;
+	        	for($i = 0; $i < $len; $i++) {
+	            	echo $past_visits[$i]["DandT"]." | ".$past_visits[$i]["firstName"]." | ".$past_visits[$i]["DocNotes"]." | ".$past_visits[$i]["medicineName"]."<br>";
+	        	}
 			?>
+
+			<h3> List of all tests conducted in descending order of visit </h3>
+
+			<?php  
+				$len = count($tests_cond);
+				$i = 0;
+	        	for($i = 0; $i < $len; $i++) {
+	            	echo $tests_cond[$i]["DandT"]." | ".$tests_cond[$i]["testName"]."<br>";
+	        	}
+			?>
+
 
 		</div>
 
@@ -80,6 +103,7 @@
 				<input type="text" placeholder="patient ID" name="patient_id" required>
 
 				<button type="submit" name="patient_scan">Submit</button>
+				<button type="submit" name="patient_scan">Logout</button>
 			</form>
 		</div>
 
