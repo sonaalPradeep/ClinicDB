@@ -3,6 +3,7 @@ body {
 }
 .main {
     flex-grow: 1;
+    background-color: #6699ff;
 }
 
 .user_block {
@@ -22,6 +23,11 @@ h3 {
     margin:10px;
 }
 
+h1 {
+    background-color: #ffcce6;
+    text-align: center;
+}
+
 #image {
     align-self: center;
     margin:auto;
@@ -37,23 +43,24 @@ h3 {
     flex-direction: column;
     align-items: center;
     border-bottom: 2px solid gainsboro;
+    opacity : 0.8;
 }
 
-.user_history {
-    padding:20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border-bottom: 2px solid gainsboro;
+.patient_listing {
+    text-align: center;
+    background-color: #e2e2e2;
+    
 }
 
 p {
     margin:0px;
     margin-bottom: 5px;
 }
+
 input[type='text'] {
     margin:20px;
 }
+
 button {
     display: block;
     margin: 10px;

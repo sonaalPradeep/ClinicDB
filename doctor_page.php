@@ -137,38 +137,6 @@
         </div>
 
         <div class="user_history">
-            <!-- <u>Last 5 Visits | Doctor Name | Diagnosis</u> -->
-            <!-- Improvised coding, please consider formating and break testing -->
-            <!-- Need to remove extra "|"'s if total number of visits is less than 5' -->
-<!--             <p>
-            <?=
-                $past_visits[0]['DandT']." | ".$past_visits[0]['firstName']." | ".$past_visits[0]['DocNotes'];
-            ?> 
-            </p>
-
-            <p>
-            <?=
-                $past_visits[1]['DandT']." | ".$past_visits[1]['firstName']." | ".$past_visits[1]['DocNotes'];
-            ?> 
-            </p>
-
-            <p>
-            <?=
-                $past_visits[2]['DandT']." | ".$past_visits[2]['firstName']." | ".$past_visits[2]['DocNotes'];
-            ?> 
-            </p>
-
-            <p>
-            <?=
-                $past_visits[3]['DandT']." | ".$past_visits[3]['firstName']." | ".$past_visits[3]['DocNotes'];
-            ?> 
-            </p>
-
-            <p>
-            <?=
-                $past_visits[4]['DandT']." | ".$past_visits[4]['firstName']." | ".$past_visits[4]['DocNotes'];
-            ?> 
-            </p> -->
             <h4><u>Patient History</u></h4>
             <?php
                 echo '<table border="1" align = "center">';
