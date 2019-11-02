@@ -137,10 +137,10 @@
         </div>
 
         <div class="user_history">
-            <u>Last 5 Visits | Doctor Name | Diagnosis</u>
+            <!-- <u>Last 5 Visits | Doctor Name | Diagnosis</u> -->
             <!-- Improvised coding, please consider formating and break testing -->
             <!-- Need to remove extra "|"'s if total number of visits is less than 5' -->
-            <p>
+<!--             <p>
             <?=
                 $past_visits[0]['DandT']." | ".$past_visits[0]['firstName']." | ".$past_visits[0]['DocNotes'];
             ?> 
@@ -168,7 +168,25 @@
             <?=
                 $past_visits[4]['DandT']." | ".$past_visits[4]['firstName']." | ".$past_visits[4]['DocNotes'];
             ?> 
-            </p>
+            </p> -->
+            <h4><u>Patient History</u></h4>
+            <?php
+                echo '<table border="1" align = "center">';
+                echo '<tr><th>Visiting Date and Time</th>
+                <th>Doctor name</th>
+                <th>Diagnosis</th></tr>';
+
+                foreach( $past_visits as $past_visit)
+                {
+                    echo '<tr>';
+                    foreach( $past_visit as $val )
+                    {
+                        echo '<td>'.$val.'</td>';
+                    }
+                    echo '</tr>';
+                }
+                echo '</table>';
+            ?>
 
         </div>
 
