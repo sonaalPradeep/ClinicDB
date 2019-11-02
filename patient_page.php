@@ -68,27 +68,47 @@
 
 <body>
 	<div class = "main">
-		<h1> Welcome to the Health Centre </h1>
+		<h1><u> Welcome to the Health Centre </u></h1>
 
 		<div class = "patient_listing">
-			<h3> List of all diagnosis in descending order of visit </h3>
+			<h3><u> List of all diagnosis in descending order of visit </u></h3>
 
-			<?php  
-				$len = count($past_visits);
-				$i = 0;
-	        	for($i = 0; $i < $len; $i++) {
-	            	echo $past_visits[$i]["DandT"]." | ".$past_visits[$i]["firstName"]." | ".$past_visits[$i]["DocNotes"]." | ".$past_visits[$i]["medicineName"]."<br>";
-	        	}
+			<?php
+				echo '<table border="1" align = "center">';
+				echo '<tr><th>Visiting date and Time</th>
+				<th>Doctor name</th>
+				<th>Diagnosis</th>
+				<th>Medicine Name</th></tr>';
+
+				foreach( $past_visits as $past_visit)
+				{
+					echo '<tr>';
+					foreach( $past_visit as $val )
+					{
+						echo '<td>'.$val.'</td>';
+					}
+					echo '</tr>';
+				}
+				echo '</table>';
 			?>
+			<br>
+			<h3><u> List of all tests conducted in descending order of visit </u></h3>
 
-			<h3> List of all tests conducted in descending order of visit </h3>
+			<?php
+				echo '<table border="1" align = "center">';
+				echo '<tr><th>Visiting date and Time</th>
+				<th>Test Name</th></tr>';
 
-			<?php  
-				$len = count($tests_cond);
-				$i = 0;
-	        	for($i = 0; $i < $len; $i++) {
-	            	echo $tests_cond[$i]["DandT"]." | ".$tests_cond[$i]["testName"]."<br>";
-	        	}
+				foreach( $tests_cond as $test_cond)
+				{
+					echo '<tr>';
+					foreach( $test_cond as $val )
+					{
+						echo '<td>'.$val.'</td>';
+					}
+					echo '</tr>';
+				}
+				echo '</table>';
 			?>
 
 
@@ -103,8 +123,8 @@
 				<input type="text" placeholder="patient ID" name="patient_id" required>
 
 				<button type="submit" name="patient_scan">Submit</button>
-				<button type="submit" name="patient_scan">Logout</button>
 			</form>
+			<a href = "register_patient.php"><button name="patient_logout">Logout</button></a>
 		</div>
 
         <?php 
