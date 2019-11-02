@@ -1,2 +1,3 @@
-DBMS Project
-Team Members : Ipsita Hansdah, Muhsrif Shaikh, Sonaal Pradeep, Varun Ramireddy
+DBMS Project : Health Centre Database
+=======================================
+###### project by Mushrif S. Shahreyar, Ipsita Hansdah, Varun Ramireddy, Sonaal P. Pradeep 
