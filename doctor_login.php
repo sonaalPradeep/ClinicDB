@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <?php
     session_start();
+    $_SESSION['doctor_id'] = null;
 ?>
 
 <?php
@@ -15,23 +16,36 @@
             die("Connection failed: " . mysqli_connect_error());
         }
         else {
-            $emailID = $_POST['email'];
+            $emailID = $_POST['emailid'];
             $pwd = $_POST['psw'];
-            $age = 70;
+            $pwd = md5($pwd);
+            
             //sql binding
-            $quries = "SELECT Pwd FROM doctor WHERE doctor.email = $emailID";
+            $sql = "SELECT * FROM doctor WHERE email = '$emailID'";
             
             $result = mysqli_query($conn, $sql);
+            
             $patient = array();
             if (mysqli_num_rows($result) > 0) {
-                $_SESSION['patient_ID'] = $id;
-            
                 while($row = mysqli_fetch_assoc($result)) {
-                    $patient = $row;
+                    if($row['Pwd'] == $pwd) {
+                        
+                        $_SESSION['doctor_id'] = $row['doctorID'];
+                        header("Location:doctor_page.php");
+                    }
+                    else {
+                        echo "<p class = login_verification>Invalid password</p>";
+                    }
+
                 }
             }
+            else {
+                echo "<p class = login_verification>Invalid email</p>";
+            }
+            
             $conn->close();
         }
+    }
 ?>
 <html>
 
@@ -41,12 +55,12 @@
 </head>
 
 <body>
-<h1>Patient Registration</h1>
+<h1>Doctor Login</h1>
   <form style="border:1px solid #ccc" id = "myForm" action = "#" method = "POST">
     <div class="container">
       <h2>Log In</h2>
       <label for="email"><b>Email ID</b></label>
-      <input type = "text" placeholder="Enter email" name = "email" required>
+      <input type = "text" placeholder="Enter email" name ="emailid" required>
       
       <label for="psw"><b>Password</b></label>
       <input type="password" placeholder="Enter Password" name="psw" required>
