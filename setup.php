@@ -96,23 +96,23 @@
             
         );
         $len = count($init_tables);
-        $i = 0;
-        for($i = 0; $i < $len; $i++) {
-            if($conn->query($init_tables[$i]) === TRUE) {
-                echo "Table[$i] constructed <br>";
-            }
-            else {
-                echo "Not established <br>";
-                echo $conn->error;
-            }
+        // $i = 0;
+        // for($i = 0; $i < $len; $i++) {
+        //     if($conn->query($init_tables[$i]) === TRUE) {
+        //         echo "Table[$i] constructed <br>";
+        //     }
+        //     else {
+        //         echo "Not established <br>";
+        //         echo $conn->error;
+        //     }
+        // }
+        if($conn->query($quries[10]) === TRUE) {
+            echo "Table Created\n";
         }
-        // if($conn->query($quries[9]) === TRUE) {
-        //     echo "Table Created\n";
-        // }
-        // else {
-        //     echo "Not established";
-        //     echo $conn->error;
-        // }
+        else {
+            echo "Not established";
+            echo $conn->error;
+        }
 
         // $load_row = array(
         //      "INSERT INTO `doctor`(`doctorID`, `firstName`, `lastName`, `contactNo`, `email`, `addr`, `workingHr`, `password`) VALUES (0,"A","B",8589503531,"ab@nitc.ac.in","Thrissur Kerala",9,"1111")"
