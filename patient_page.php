@@ -1,5 +1,8 @@
 <?php
-	session_start()
+	session_start();
+	if(!isset($_SESSION['patient_id'])) {
+		header("Location:patient_login.php");
+	}
 ?>
 
 <!DOCTYPE HTML>
@@ -12,8 +15,9 @@
 
 <?php
 	$patient;
-	if(isset($_POST['patient_scan'])) {
-		$id = $_POST['patient_id'];
+	$past_visits;
+	// if(isset($_POST['patient_scan'])) {
+	// 	$id = $_POST['patient_id'];
 
 		$servername = 'localhost';
 		$dbname = 'hospitalManagement';
@@ -25,33 +29,35 @@
 		if(!$conn) {
 			die("Connection failed : ". mysqli_connect_error());
 		}
-
-		$sql = "SELECT * FROM patient WHERE patientID = $id";
-		$result = mysqli_query($conn, $sql);
-		$patient = array();
-
-		if(mysqli_num_rows($result) > 0) {
-			$_SESSION['patient_ID'] = $id;
-
-			while($row = mysqli_fetch_assoc($result)) {
-				$patient = $row;
-			}
-
-		}
-
+		$id = $_SESSION['patient_id'];
+		
 		// Need to try to include ISNULL function to show if no medicines were given ISNULL(vpm.medicineName, 'N/A')
-		$sql2 = "SELECT V.DandT, D.firstName, dn.DocNotes, vpm.medicineName FROM (((visit V INNER JOIN doctor D ON V.docID = D.doctorID) INNER JOIN diagnosis dn ON V.visitID = dn.visID) LEFT JOIN view_presc_med vpm ON vpm.visitID = V.visitID) WHERE V.pID = $id ORDER BY DandT DESC";
-		$result2 = mysqli_query($conn, $sql2);
+		$sql2 = "SELECT V.DandT, D.firstName, dn.DocNotes, vpm.medicineName 
+					FROM (((visit V INNER JOIN doctor D ON V.docID = D.doctorID) 
+						INNER JOIN diagnosis dn ON V.visitID = dn.visID) 
+						LEFT JOIN view_presc_med vpm ON vpm.visitID = V.visitID) 
+					WHERE V.pID = $id 
+					ORDER BY DandT DESC";
+
+		$result2 = mysqli_query($conn, $sql2) or die(mysqli_error($conn));
 		$past_visits = array();
 
 		if(mysqli_num_rows($result2) > 0) {
 			while($row = mysqli_fetch_assoc($result2)) {
+				// echo $row['firstName'];
 				array_push($past_visits, $row);
 			}
 		}
+		else {
+			// echo "No data Found";
+		}
 
-		$sql3 = "SELECT V.DandT, t.testName FROM ((VISIT V INNER JOIN visitAndTest vat ON V.visitID = vat.visID) INNER JOIN test t ON t.testID = vat.testID)) WHERE V.pID = $id ORDER BY DandT DESC";
-		$result3 = mysqli_query($conn, $sql3);
+		$sql3 = "SELECT V.DandT, t.testName 
+					FROM ((visit V INNER JOIN visitAndtest vat ON V.visitID = vat.visID) 
+						INNER JOIN test t ON t.testID = vat.testID)
+					WHERE V.pID = $id 
+					ORDER BY DandT DESC";
+		$result3 = mysqli_query($conn, $sql3) or die(mysqli_error($conn));
 		$tests_cond = array();
 
 		if(mysqli_num_rows($result3) > 0) {
@@ -59,17 +65,26 @@
 				array_push($tests_cond, $row);
 			}
 		}
-
-
-
+		else {
+			// echo "No data found";
+		}
 		$conn->close();
-	}
+	// }
 ?>
+
+<script>
+   var items= <?php echo json_encode($past_visits); ?>;
+   console.log(items[2]); // Output: Bear
+   // OR
+   alert(items[0]); // Output: Apple
+</script>
 
 <body>
 	<div class = "main">
-		<h1><u> Welcome to the Health Centre </u></h1>
-
+		<h1> Welcome to the Health Centre </h1>
+		<?php 
+			if(isset($past_visits)):
+		?>
 		<div class = "patient_listing">
 			<h3><u> List of all diagnosis in descending order of visit </u></h3>
 
@@ -110,63 +125,12 @@
 				}
 				echo '</table>';
 			?>
-
+		
 
 		</div>
-
-	</div>
-
-	<div class = 'user_block'>
-		<div class = 'user_scan'>
-			<form action="#" method="POST">
-				<label for="patient_id">Enter the Patient ID</label>
-				<input type="text" placeholder="patient ID" name="patient_id" required>
-
-				<button type="submit" name="patient_scan">Submit</button>
-			</form>
-			<a href = "register_patient.php"><button name="patient_logout">Logout</button></a>
-		</div>
-
-        <?php 
-            if(isset($patient)):
-            
-        ?>
-        <div class="user_info">
-            
-            <img id='image' src='user2.png' alt='user'>
-            <p>
-            <?=
-                "ID :  ".$patient['patientID'];
-            ?>
-            </p>
-            <h3>
-            <?=
-               $patient['firstName']."   ".$patient['lastName'];
-            ?>
-            </h3>
-            <p>
-            <?=
-                $patient['email'];
-            ?>
-            </p>
-            <p>
-            <?=
-                $patient['contactNo'];
-            ?>
-            </p>
-            <p>
-            <?php
-                $from = $patient['dob'];
-                $to = new DateTime('today');
-
-                echo $patient['dob']." (".date_diff(date_create($patient['dob']), date_create('today'))->y.") ";
-            ?>
-            </p>
-        </div>
-        
-        <?php
-            endif;
-        ?>
+	<?php 
+			endif;
+	?>
 
 	</div>
 </body>
