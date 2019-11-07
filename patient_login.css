@@ -1,5 +1,5 @@
 body{
-  margin: 0;
+  margin: 20px;
   padding: 0;
   font-family: sans-serif;
   background-color: #6699ff;
@@ -7,8 +7,8 @@ body{
 }
 
 .box{
-  width: 300px;
-  padding: : 40px;
+  width: 450px;
+  padding: 40px;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -16,6 +16,7 @@ body{
   background: #191919;
   text-align: center;
   border-radius: 10px;
+  
 }
 
 .box input[type = "text"],.box input[type = "password"]{
@@ -60,4 +61,15 @@ body{
 
 .box input[type = "submit"]:hover{
   background: #2ecc71;
+}
+
+.login_verification {
+  margin: auto;
+  margin-top:70px;
+  text-align: center;
+  width: 350px;
+  color: white;
+  font-size: 20px;
+  background-color: #ff726f;
+  border-radius: 5px;
 }
