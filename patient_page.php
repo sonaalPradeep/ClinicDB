@@ -18,30 +18,25 @@
 	$past_visits;
 	// if(isset($_POST['patient_scan'])) {
 	// 	$id = $_POST['patient_id'];
-
 		$servername = 'localhost';
 		$dbname = 'hospitalManagement';
 		$username = 'root';
 		$password = 'root';
-
 		$conn = mysqli_connect($servername, $username, $password, $dbname);
-
 		if(!$conn) {
 			die("Connection failed : ". mysqli_connect_error());
 		}
 		$id = $_SESSION['patient_id'];
-		
-		// Need to try to include ISNULL function to show if no medicines were given ISNULL(vpm.medicineName, 'N/A')
-		$sql2 = "SELECT V.DandT, D.firstName, dn.DocNotes, vpm.medicineName 
-					FROM (((visit V INNER JOIN doctor D ON V.docID = D.doctorID) 
-						INNER JOIN diagnosis dn ON V.visitID = dn.visID) 
-						LEFT JOIN view_presc_med vpm ON vpm.visitID = V.visitID) 
-					WHERE V.pID = $id 
-					ORDER BY DandT DESC";
 
+		// Need to try to include ISNULL function to show if no medicines were given ISNULL(vpm.medicineName, 'N/A')
+		$sql2 = "SELECT V.DandT, D.firstName, dn.DocNotes, vpm.medicineName
+					FROM (((visit V INNER JOIN doctor D ON V.docID = D.doctorID)
+						INNER JOIN diagnosis dn ON V.visitID = dn.visID)
+						LEFT JOIN view_presc_med vpm ON vpm.visitID = V.visitID)
+					WHERE V.pID = $id
+					ORDER BY DandT DESC";
 		$result2 = mysqli_query($conn, $sql2) or die(mysqli_error($conn));
 		$past_visits = array();
-
 		if(mysqli_num_rows($result2) > 0) {
 			while($row = mysqli_fetch_assoc($result2)) {
 				// echo $row['firstName'];
@@ -51,15 +46,13 @@
 		else {
 			// echo "No data Found";
 		}
-
-		$sql3 = "SELECT V.DandT, t.testName 
-					FROM ((visit V INNER JOIN visitAndtest vat ON V.visitID = vat.visID) 
+		$sql3 = "SELECT V.DandT, t.testName
+					FROM ((visit V INNER JOIN visitAndtest vat ON V.visitID = vat.visID)
 						INNER JOIN test t ON t.testID = vat.testID)
-					WHERE V.pID = $id 
+					WHERE V.pID = $id
 					ORDER BY DandT DESC";
 		$result3 = mysqli_query($conn, $sql3) or die(mysqli_error($conn));
 		$tests_cond = array();
-
 		if(mysqli_num_rows($result3) > 0) {
 			while($row = mysqli_fetch_assoc($result3)) {
 				array_push($tests_cond, $row);
@@ -82,7 +75,7 @@
 <body>
 	<div class = "main">
 		<h1> Welcome to the Health Centre </h1>
-		<?php 
+		<?php
 			if(isset($past_visits)):
 		?>
 		<div class = "patient_listing">
@@ -94,7 +87,6 @@
 				<th>Doctor name</th>
 				<th>Diagnosis</th>
 				<th>Medicine Name</th></tr>';
-
 				foreach( $past_visits as $past_visit)
 				{
 					echo '<tr>';
@@ -113,7 +105,6 @@
 				echo '<table border="1" align = "center">';
 				echo '<tr><th>Visiting date and Time</th>
 				<th>Test Name</th></tr>';
-
 				foreach( $tests_cond as $test_cond)
 				{
 					echo '<tr>';
@@ -125,10 +116,10 @@
 				}
 				echo '</table>';
 			?>
-		
+
 
 		</div>
-	<?php 
+	<?php
 			endif;
 	?>
 
