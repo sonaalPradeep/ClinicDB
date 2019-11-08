@@ -29,14 +29,16 @@
 		$id = $_SESSION['patient_id'];
 
 		// Need to try to include ISNULL function to show if no medicines were given ISNULL(vpm.medicineName, 'N/A')
-		$sql2 = "SELECT V.DandT, D.firstName, dn.DocNotes, vpm.medicineName
+		$sql2 = "SELECT V.DandT, D.firstName, dn.DocNotes, GROUP_CONCAT(vpm.medicineName)
 					FROM (((visit V INNER JOIN doctor D ON V.docID = D.doctorID)
 						INNER JOIN diagnosis dn ON V.visitID = dn.visID)
 						LEFT JOIN view_presc_med vpm ON vpm.visitID = V.visitID)
 					WHERE V.pID = $id
+					GROUP BY V.DandT, D.firstName, dn.DocNotes
 					ORDER BY DandT DESC";
 		$result2 = mysqli_query($conn, $sql2) or die(mysqli_error($conn));
 		$past_visits = array();
+
 		if(mysqli_num_rows($result2) > 0) {
 			while($row = mysqli_fetch_assoc($result2)) {
 				// echo $row['firstName'];
@@ -53,6 +55,8 @@
 					ORDER BY DandT DESC";
 		$result3 = mysqli_query($conn, $sql3) or die(mysqli_error($conn));
 		$tests_cond = array();
+
+
 		if(mysqli_num_rows($result3) > 0) {
 			while($row = mysqli_fetch_assoc($result3)) {
 				array_push($tests_cond, $row);
@@ -61,15 +65,16 @@
 		else {
 			// echo "No data found";
 		}
+
 		$conn->close();
 	// }
 ?>
 
 <script>
    var items= <?php echo json_encode($past_visits); ?>;
-   console.log(items[2]); // Output: Bear
+   // console.log(items[2]); // Output: Bear
    // OR
-   alert(items[0]); // Output: Apple
+   // alert(items[0]); // Output: Apple
 </script>
 
 <body>
@@ -116,6 +121,8 @@
 				}
 				echo '</table>';
 			?>
+
+
 
 
 		</div>
