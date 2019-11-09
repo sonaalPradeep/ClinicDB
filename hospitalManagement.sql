@@ -1,15 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 4.9.1
+-- version 4.6.6deb5
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: Nov 07, 2019 at 06:21 PM
--- Server version: 10.4.8-MariaDB
--- PHP Version: 7.3.11
+-- Host: localhost:3306
+-- Generation Time: Nov 09, 2019 at 02:12 PM
+-- Server version: 5.7.27-0ubuntu0.18.04.1
+-- PHP Version: 7.2.24-0ubuntu0.18.04.1
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
-START TRANSACTION;
 SET time_zone = "+00:00";
 
 
@@ -105,12 +103,12 @@ CREATE TABLE `medicine` (
 --
 
 INSERT INTO `medicine` (`medicineID`, `medicineName`, `distributer`, `stock`) VALUES
-(1, 'PCM', NULL, 120),
-(2, 'Bcomplex', NULL, 200),
+(1, 'PCM', NULL, 0),
+(2, 'Bcomplex', NULL, 100),
 (3, 'Citricin', NULL, 120),
-(4, 'ORS', NULL, 200),
-(5, 'Paracetamol', 'Mushrif', 120),
-(6, 'Tylenol', '', 200);
+(4, 'ORS', NULL, 178),
+(5, 'Paracetamol', 'Mushrif', 80),
+(6, 'Tylenol', '', 80);
 
 -- --------------------------------------------------------
 
@@ -120,28 +118,55 @@ INSERT INTO `medicine` (`medicineID`, `medicineName`, `distributer`, `stock`) VA
 
 CREATE TABLE `medprescribed` (
   `prescID` int(11) NOT NULL,
-  `medID` int(11) NOT NULL
+  `medID` int(11) NOT NULL,
+  `dosage` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `medprescribed`
 --
 
-INSERT INTO `medprescribed` (`prescID`, `medID`) VALUES
-(12, 3),
-(20, 1),
-(20, 3),
-(20, 5),
-(21, 1),
-(21, 2),
-(21, 5),
-(22, 3),
-(23, 1),
-(23, 2),
-(23, 4),
-(24, 3),
-(24, 4),
-(24, 6);
+INSERT INTO `medprescribed` (`prescID`, `medID`, `dosage`) VALUES
+(12, 3, 10),
+(20, 1, 10),
+(20, 3, 10),
+(20, 5, 10),
+(21, 1, 10),
+(21, 2, 10),
+(21, 5, 10),
+(22, 3, 10),
+(23, 1, 10),
+(23, 2, 10),
+(23, 4, 10),
+(24, 3, 10),
+(24, 4, 10),
+(24, 6, 10),
+(24, 6, 100),
+(24, 6, 100),
+(24, 5, 90),
+(24, 5, 90),
+(24, 5, 10),
+(24, 5, 10),
+(24, 6, 10),
+(24, 6, 10),
+(24, 4, 10),
+(24, 4, 10),
+(24, 4, 1),
+(24, 4, 1),
+(24, 1, 60),
+(24, 1, 60),
+(24, 2, 100),
+(24, 2, 100);
+
+--
+-- Triggers `medprescribed`
+--
+DELIMITER $$
+CREATE TRIGGER `tg_deduct_meds` AFTER INSERT ON `medprescribed` FOR EACH ROW UPDATE medicine M
+SET M.stock = M.stock - (NEW.dosage)/2
+WHERE NEW.medID = M.medicineID
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -448,7 +473,10 @@ INSERT INTO `visit` (`visitID`, `DandT`, `pID`, `docID`) VALUES
 (174, '2019-11-06 09:11:07', 3, 1),
 (175, '2019-11-06 09:13:35', 1, 1),
 (176, '2019-11-06 09:16:32', 1, 1),
-(177, '2019-11-07 23:38:18', 3, 1);
+(177, '2019-11-07 23:38:18', 3, 1),
+(178, '2019-11-08 00:11:21', 1, 2),
+(179, '2019-11-08 14:48:13', 1, 1),
+(180, '2019-11-08 15:01:47', 1, 2);
 
 -- --------------------------------------------------------
 
@@ -468,7 +496,7 @@ CREATE TABLE `visitAndtest` (
 --
 DROP TABLE IF EXISTS `view_presc_med`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `view_presc_med`  AS  select `V`.`visitID` AS `visitID`,`P`.`prescriptionID` AS `prescriptionID`,`M`.`medicineName` AS `medicineName` from ((((`visit` `V` left join `diagnosis` `D` on(`V`.`visitID` = `D`.`visID`)) left join `prescription` `P` on(`P`.`diagID` = `D`.`diagnoseID`)) left join `medprescribed` `mp` on(`P`.`prescriptionID` = `mp`.`prescID`)) left join `medicine` `M` on(`M`.`medicineID` = `mp`.`medID`)) ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `view_presc_med`  AS  select `V`.`visitID` AS `visitID`,`P`.`prescriptionID` AS `prescriptionID`,`M`.`medicineName` AS `medicineName` from ((((`visit` `V` left join `diagnosis` `D` on((`V`.`visitID` = `D`.`visID`))) left join `prescription` `P` on((`P`.`diagID` = `D`.`diagnoseID`))) left join `medprescribed` `mp` on((`P`.`prescriptionID` = `mp`.`prescID`))) left join `medicine` `M` on((`M`.`medicineID` = `mp`.`medID`))) ;
 
 --
 -- Indexes for dumped tables
@@ -550,49 +578,41 @@ ALTER TABLE `visitAndtest`
 --
 ALTER TABLE `diagnosis`
   MODIFY `diagnoseID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
-
 --
 -- AUTO_INCREMENT for table `doctor`
 --
 ALTER TABLE `doctor`
   MODIFY `doctorID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
 --
 -- AUTO_INCREMENT for table `medicine`
 --
 ALTER TABLE `medicine`
   MODIFY `medicineID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-
 --
 -- AUTO_INCREMENT for table `patient`
 --
 ALTER TABLE `patient`
   MODIFY `patientID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
 --
 -- AUTO_INCREMENT for table `prescription`
 --
 ALTER TABLE `prescription`
   MODIFY `prescriptionID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
-
 --
 -- AUTO_INCREMENT for table `referral`
 --
 ALTER TABLE `referral`
   MODIFY `referralID` int(11) NOT NULL AUTO_INCREMENT;
-
 --
 -- AUTO_INCREMENT for table `test`
 --
 ALTER TABLE `test`
   MODIFY `testID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
 --
 -- AUTO_INCREMENT for table `visit`
 --
 ALTER TABLE `visit`
-  MODIFY `visitID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=178;
-
+  MODIFY `visitID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=181;
 --
 -- Constraints for dumped tables
 --
@@ -635,7 +655,6 @@ ALTER TABLE `visit`
 ALTER TABLE `visitAndtest`
   ADD CONSTRAINT `visitAndtest_ibfk_1` FOREIGN KEY (`testID`) REFERENCES `test` (`testID`),
   ADD CONSTRAINT `visitAndtest_ibfk_2` FOREIGN KEY (`visID`) REFERENCES `visit` (`visitID`);
-COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
