@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
-<head>  
+<head>
   <link rel= "stylesheet" type = "text/css" href= "medicine_page.css">
 </head>
 
 <?php
-  
+
   if (isset($_POST['test-stock'])) {
     $servername = 'localhost';
     $dbname = 'hospitalManagement';
@@ -13,12 +13,12 @@
     $password = 'root';
     $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-  
+
     $testname = $_POST['testname'];
     //sql binding
     $quries = "INSERT INTO test(testName)
                   VALUES (:testname)";
-    
+
     $stmt = $conn->prepare($quries);
     $stmt->bindParam(':testname',$testname);
     $stmt->execute();
@@ -26,9 +26,9 @@
     $conn = null;
   }
 
-  
+
 ?>
-<body>
+<body style="text-align:center">
   <h1>Medicine Stock</h1>
   <form style="border:1px solid #ccc" id = "myForm" action = "#" method = "POST">
     <div class="container">
@@ -42,11 +42,11 @@
           <button type="submit" class="signupbtn" name="test-stock">Submit</button>
         </div>
     </div>
-  </form> 
+  </form>
   <script>
     document.querySelector("#myForm").addEventListener("submit", function(e){
       var isValid = true;
-      
+
       if(!isValid){
         e.preventDefault();    //stop form from submitting
       }

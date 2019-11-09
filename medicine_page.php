@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
-<head>  
+<head>
   <link rel= "stylesheet" type = "text/css" href= "medicine_page.css">
 </head>
 
 <?php
-  
+
   if (isset($_POST['medicine-stock'])) {
     $servername = 'localhost';
     $dbname = 'hospitalManagement';
@@ -13,14 +13,14 @@
     $password = 'root';
     $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-  
+
     $medname = $_POST['medname'];
     $dname = $_POST['dname'];
     $stock = $_POST['stock'];
     //sql binding
     $quries = "INSERT INTO medicine(medicineName, distributer, stock)
                   VALUES (:medname, :dname , :stock)";
-    
+
     $stmt = $conn->prepare($quries);
     $stmt->bindParam(':medname',$medname);
     $stmt->bindParam(':dname',$dname);
@@ -30,11 +30,11 @@
     $conn = null;
   }
 
-  
+
 ?>
-<body>
+<body style="text-align: center">
   <h1>Medicine Stock</h1>
-  <form style="border:1px solid #ccc" id = "myForm" action = "#" method = "POST">
+  <form style="border:1px solid #ccc; padding: 0px 50px 0px 50px" id = "myForm" action = "#" method = "POST">
     <div class="container">
         <h2>Enter Details</h2>
         <p>Please Enter the details of the medicine.</p>
@@ -51,18 +51,18 @@
           <button type="submit" class="signupbtn" name="medicine-stock">Submit</button>
         </div>
     </div>
-  </form> 
+  </form>
   <script>
     // function verify() {
-      
+
     //   console.log("sadasds");
     //   var fname = document.getElementsByName("fname")[0];
     //   console.log(fname);
-      
+
     // }
     document.querySelector("#myForm").addEventListener("submit", function(e){
       var isValid = true;
-      
+
       if(!isValid){
         e.preventDefault();    //stop form from submitting
       }
