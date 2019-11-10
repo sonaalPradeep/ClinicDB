@@ -189,14 +189,16 @@
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         
         $test = $_POST['test_sel'];
-        print_r($test);
-        $quries = "INSERT INTO visitAndtest(visID, testID)
-                             VALUES (:visID, :testID)";
-        foreach($test as $val) {
-            $stmt = $conn->prepare($quries);
-            $stmt->bindParam(':visID', $_SESSION['visitID']);
-            $stmt->bindParam(':testID', $val);
-            $stmt->execute();
+        if(sizeof($test) != 0) {
+            print_r($test);
+            $quries = "INSERT INTO visitAndtest(visID, testID)
+                                 VALUES (:visID, :testID)";
+            foreach($test as $val) {
+                $stmt = $conn->prepare($quries);
+                $stmt->bindParam(':visID', $_SESSION['visitID']);
+                $stmt->bindParam(':testID', $val);
+                $stmt->execute();
+            }
         }
     }
 ?>
