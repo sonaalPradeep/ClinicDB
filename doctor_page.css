@@ -27,6 +27,7 @@ h3,h4 {
     margin:10px;
 }
 
+
 #image {
     align-self: center;
     margin:auto;
@@ -51,6 +52,15 @@ p {
 }
 input[type='text'] {
     margin:20px;
+}
+
+select,input[type='number'] {
+  width: 100%;
+  padding: 15px;
+  margin: 10px 0 22px 0;
+  display: inline-block;
+  border: none;
+  background: #f1f1f1;
 }
 button {
     display: block;
@@ -150,3 +160,9 @@ th,tr {
   padding: 10px;
   border-bottom:1px solid #ddd;
 }
+td {
+  height: 30px;
+  text-align: center;
+  padding: 10px;
+}
+

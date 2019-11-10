@@ -3,6 +3,9 @@
     if(!isset($_SESSION['doctor_id'])) {
         header('Location:doctor_login.php');
     }
+    if(!isset($_SESSION['count'])) {
+        $_SESSION['count'] = 0;
+    }
 ?>
 
 <!DOCTYPE html>
@@ -12,17 +15,43 @@
     <title>Doctor</title>
     <link rel= "stylesheet" type = "text/css" href= "doctor_page.css">
 
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src='select2.min.js' type='text/javascript'></script>
 
     <link href='select2.min.css' rel='stylesheet' type='text/css'>
 
 </head>
-
-
 <?php 
     $patient;
     
+    $servername = 'localhost';
+    $dbname = 'hospitalManagement';
+    $username = 'root';
+    $password = 'root';
+    $conn = mysqli_connect($servername, $username, $password, $dbname);
+    // Check connection
+    if (!$conn) {
+        die("Connection failed: " . mysqli_connect_error());
+    }
+    $sql2 = "SELECT medicineID,medicineName FROM medicine";
+    $med_result = mysqli_query($conn, $sql2);
+    $medicine_names = array();
+    if(mysqli_num_rows($med_result) > 0) {
+        while($row = mysqli_fetch_assoc($med_result)) {
+            array_push($medicine_names, $row);
+        }
+    }
+
+    $sql10 = 'SELECT testID,testName FROM test'; 
+    $test_result = mysqli_query($conn, $sql10);
+    $test_names = array();
+    if(mysqli_num_rows($test_result) > 0) {
+        while($row = mysqli_fetch_assoc($test_result)) {
+            array_push($test_names, $row);
+        }
+    }
+
     if(isset($_POST['patient_scan'])) {
         $id = $_POST['patient_id'];
         
@@ -47,7 +76,10 @@
             }
         }
 
-        $sql2 = "SELECT V.DandT, D.firstName, dn.DocNotes FROM ((visit V INNER JOIN doctor D ON D.doctorID = V.docID) INNER JOIN diagnosis dn ON dn.visID = V.visitID) WHERE V.pID = $id ORDER BY DandT DESC LIMIT 5";
+        $sql2 = "SELECT V.DandT, D.firstName, dn.DocNotes 
+                    FROM ((visit V INNER JOIN doctor D ON D.doctorID = V.docID) 
+                        INNER JOIN diagnosis dn ON dn.visID = V.visitID) 
+                    WHERE V.pID = $id ORDER BY DandT DESC LIMIT 5";
         $result2 = mysqli_query($conn, $sql2);
         $past_visits = array();
 
@@ -56,17 +88,8 @@
                 array_push($past_visits, $row);
             }
         }
+        // echo $_SESSION['visitID'];
         
-        $sql2 = "SELECT medicineID,medicineName FROM medicine";
-        $med_result = mysqli_query($conn, $sql2);
-        $medicine_names = array();
-
-        if(mysqli_num_rows($med_result) > 0) {
-            while($row = mysqli_fetch_assoc($med_result)) {
-                array_push($medicine_names, $row);
-            }
-        }
-
         $conn->close();
         
 
@@ -85,9 +108,10 @@
         $stmt->bindParam(':docID',$docID);
         $stmt->execute();
         $_SESSION['visitID'] = $conn->lastInsertId();
-        // echo $_SESSION['visitID'];
-        
+        $_SESSION['count'] = 0;
+        // echo $_SESSION['count'];
         $conn = null;
+        $_POST['patient_scan'] = null;
     }
 
     if(isset($_POST['doctor_diagnosis'])) {
@@ -116,41 +140,73 @@
         $stmt->execute();
         $prescriptionID = $conn->lastInsertId();
 
-        $med = $_POST['med_sel'];
+        $med_names = [];
+        $dosage = [];
+        $count = $_SESSION['count'];
+        // echo $_SESSION['count'];
+        // echo $count;
+        $x = 0;
 
-        $quries = "INSERT INTO medprescribed(prescID, medID)
-                             VALUES (:prescID, :medID)";
+        while($x <= $count) {
+            $temp2 = $_POST['medicine_name'.(string)$x];
+            $temp3 = $_POST['dosage'.(string)$x];
+            array_push($med_names,$temp2);
+            array_push($dosage,$temp3);
+            $x++;
+        }
+        
+        $quries = "INSERT INTO medprescribed(prescID, medID, dosage)
+                             VALUES (:prescID, :medID, :dosage)";
+        $x = 0;
+        while($x <= $count) {
 
-        foreach($med as $val) {
+            $val = $med_names[$x];
+            $dos = $dosage[$x];
             $stmt = $conn->prepare($quries);
 
             $stmt->bindParam(':prescID', $prescriptionID);
             $stmt->bindParam(':medID', $val);
+            $stmt->bindParam(':dosage',$dos);
             $stmt->execute();
+
+            //Reducing the stock Count----
+            $conn_new = mysqli_connect($servername, $username, $password, $dbname);
+            // Check connection
+            if (!$conn_new) {
+                die("Connection failed: " . mysqli_connect_error());
+            }
+            $stck = $dos * 3;
+            $nnn_sql = "UPDATE medicine SET stock=stock-$stck 
+                            WHERE medicineID = $val";
+            $res = mysqli_query($conn_new,$nnn_sql);
+            //----
+
+            $x++;
         }
 
         $conn = null;
+        $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         
-        //Text Part it remaining
+        $test = $_POST['test_sel'];
+        print_r($test);
+        $quries = "INSERT INTO visitAndtest(visID, testID)
+                             VALUES (:visID, :testID)";
+        foreach($test as $val) {
+            $stmt = $conn->prepare($quries);
+            $stmt->bindParam(':visID', $_SESSION['visitID']);
+            $stmt->bindParam(':testID', $val);
+            $stmt->execute();
+        }
     }
-
 ?>
 <script>
-    $(document).ready(function(){
- 
- // Initialize select2
-    $("#selMedicine").select2();
-        
-    // Read selected option
-    // $('#but_read').click(function(){
-    //     var username = $('#selMedicine option:selected').text();
-    //     var userid = $('#selMedicine').val();
-    
-    //     $('#result').html("id : " + userid + ", name : " + username);
-    
-    //     });
-    });
+$(document).ready(function(){
+            $("#selMedicine").select2();
+
+});
 </script>
+
 <body>
     <div class="main">
         <h1> WELCOME DOCTOR </h1>
@@ -170,19 +226,49 @@
                 <textarea type="text" name= "diagnosis" placeholder="Enter the diagnosis Report of the Patient" rows="10" columns="40"></textarea>
                 
                 <label for="medicine"><b>Select Medicine</b></label>
-                <select multiple id='selMedicine' class="medicine_sel" name="med_sel[]" placeholder="select Medicine">
-                    <?php 
-                        foreach($medicine_names as $med_name) {
-                            echo '<option value="'.$med_name['medicineID'].'">'.$med_name['medicineName'].'</option>';
-                        } 
-                    ?>
-                </select>
+                <div class='med'>
+                    <table id="medAdd">
+                        <thead>
+                            <tr>
+                                <th>Medicine Name</th>
+                                <th>Dosage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <select name="medicine_name0">
+                                    <?php 
+                                        foreach($medicine_names as $med_name) {
+                                            echo '<option value="'.$med_name['medicineID'].'">'.$med_name['medicineName'].'</option>';
+                                        } 
+                                    ?>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="number" name='dosage0' placeholder='Enter the number of days'>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button background-color='#f1f1f1' class='add' type='button' onclick="myfunction()">Add</button>
+                    
+                </div>
 
+                    
                 <label for="Reference"><b>Reference</b></label>
                 <textarea type="text" name="reference" placeholder="Enter the reference details" rows="10" columns="40"></textarea>
 
                 <label for="test"><b>Test</b></label>
-                <textarea type="text" name="test" placeholder="Enter the test details" rows="10" columns="40"></textarea>
+                <!-- <textarea type="text" name="test" placeholder="Enter the test details" rows="10" columns="40"></textarea>
+                 -->
+                <select multiple id='selMedicine' class="medicine_sel" name="test_sel[]" placeholder="select Medicine">
+                    <?php 
+                        foreach($test_names as $med_name) {
+                            echo '<option value="'.$med_name['testID'].'">'.$med_name['testName'].'</option>';
+                        } 
+                    ?>
+                </select>
                 
                 <button type="submit" name="doctor_diagnosis" id="but_read">Submit</button>
 
@@ -257,6 +343,28 @@
         </div>
         <?php endif; ?>
     </div>
+    <script>
+        
+        function myfunction() {
+            <?php 
+                $_SESSION['count']++;
+            ?>
+            var count = <?php echo $_SESSION['count']; ?>;
+            console.log(count);
+            
+            var med_n = <?php echo json_encode($medicine_names); ?>;
+            var final_str = [];
+            for(i = 0; i<med_n.length;i++) {
+                var str = "<option value='" + med_n[i].medicineID + "'>" + med_n[i].medicineName + "</option>";
+                final_str = final_str + str;
+                
+            }
+            var new_row="<tr><td><select name='medicine_name"+ count +"'>"+ final_str +"</td><td><input type='number' name='dosage"+ count +"' placeholder='Enter the number of days'></td></tr>";
+            console.log(new_row);
+            $('#medAdd').append(new_row);
+
+        }
+    </script>
 </body>
 
 

@@ -3,6 +3,7 @@
 <html>
 <head>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <link rel= "stylesheet" type = "text/css" href= "medicine_details.css">
 </head>
 
 <?php
@@ -27,11 +28,20 @@
     }
 
     if(isset($_POST['changeBtn'])) {
-        $sql = "";
+        $stck = $_POST['stock'];
+        $id = $_POST['medID'];
+        $sql = "UPDATE medicine SET stock=stock+$stck 
+                    WHERE medicineID = $id";
         $res = mysqli_query($conn,$sql);
-        
-    }
+        if($res) {
+            echo "Inserted Successfully";
+        }
+        else {
+            echo "error";
+        }
 
+        header('Refresh:0');
+    }
 ?>
 <body>
     <div id="med_div">
@@ -59,6 +69,10 @@
         <form action='#' method='POST'>
             <label for="Medicine ID">Enter the Medicine Details</label>
             <input name="medID" placeholder="Enter the id of medicine" required>
+
+            <label for="Stock">Stock Amount</label>
+            <input name="stock" placeholder="Stock Amount" required>
+
             <button type="submit" name="changeBtn">Add stock</button>
         </form>
 <script>

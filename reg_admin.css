@@ -1,1 +1,23 @@
+h1 {
+    font-size: 40px;
+    text-align: center;
+    margin-bottom: 40px;
+}
+a {
+    text-decoration: none;
+}
+.main {
+    margin-top:30px;
+}
+button {
+    width: 250px;
+    height: 100px;
+    margin: 30px auto;
+    margin-top : 40px;
+    display: block;
+    font-size: 20px;
+    border:none;
+    background-color: gray;
+    color: white;
+}
 
