@@ -5,6 +5,7 @@
     }
     if(!isset($_SESSION['count'])) {
         $_SESSION['count'] = 0;
+        $_SESSION['flag'] = 0;
     }
 ?>
 
@@ -80,6 +81,7 @@
                     FROM ((visit V INNER JOIN doctor D ON D.doctorID = V.docID) 
                         INNER JOIN diagnosis dn ON dn.visID = V.visitID) 
                     WHERE V.pID = $id ORDER BY DandT DESC LIMIT 5";
+
         $result2 = mysqli_query($conn, $sql2);
         $past_visits = array();
 
@@ -88,11 +90,8 @@
                 array_push($past_visits, $row);
             }
         }
-        // echo $_SESSION['visitID'];
-        
         $conn->close();
         
-
         $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         
@@ -108,8 +107,8 @@
         $stmt->bindParam(':docID',$docID);
         $stmt->execute();
         $_SESSION['visitID'] = $conn->lastInsertId();
+        
         $_SESSION['count'] = 0;
-        // echo $_SESSION['count'];
         $conn = null;
         $_POST['patient_scan'] = null;
     }
@@ -143,8 +142,7 @@
         $med_names = [];
         $dosage = [];
         $count = $_SESSION['count'];
-        // echo $_SESSION['count'];
-        // echo $count;
+        
         $x = 0;
 
         while($x <= $count) {
@@ -188,17 +186,27 @@
         $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         
+        // $test = $_POST['test_sel'];
+        // if(sizeof($test) != 0) {
+        //     print_r($test);
+        //     $quries = "INSERT INTO visitAndtest(visID, testID)
+        //                          VALUES (:visID, :testID)";
+        //     foreach($test as $val) {
+        //         $stmt = $conn->prepare($quries);
+        //         $stmt->bindParam(':visID', $_SESSION['visitID']);
+        //         $stmt->bindParam(':testID', $val);
+        //         $stmt->execute();
+        //     }
+        // }
         $test = $_POST['test_sel'];
-        if(sizeof($test) != 0) {
-            print_r($test);
-            $quries = "INSERT INTO visitAndtest(visID, testID)
-                                 VALUES (:visID, :testID)";
-            foreach($test as $val) {
-                $stmt = $conn->prepare($quries);
-                $stmt->bindParam(':visID', $_SESSION['visitID']);
-                $stmt->bindParam(':testID', $val);
-                $stmt->execute();
-            }
+        print_r($test);
+        $quries = "INSERT INTO visitAndtest(visID, testID)
+                             VALUES (:visID, :testID)";
+        foreach($test as $val) {
+            $stmt = $conn->prepare($quries);
+            $stmt->bindParam(':visID', $_SESSION['visitID']);
+            $stmt->bindParam(':testID', $val);
+            $stmt->execute();
         }
     }
 ?>
@@ -351,10 +359,12 @@ $(document).ready(function(){
             <?php 
                 $_SESSION['count']++;
             ?>
+
             var count = <?php echo $_SESSION['count']; ?>;
             console.log(count);
             
             var med_n = <?php echo json_encode($medicine_names); ?>;
+            
             var final_str = [];
             for(i = 0; i<med_n.length;i++) {
                 var str = "<option value='" + med_n[i].medicineID + "'>" + med_n[i].medicineName + "</option>";
@@ -362,7 +372,6 @@ $(document).ready(function(){
                 
             }
             var new_row="<tr><td><select name='medicine_name"+ count +"'>"+ final_str +"</td><td><input type='number' name='dosage"+ count +"' placeholder='Enter the number of days'></td></tr>";
-            console.log(new_row);
             $('#medAdd').append(new_row);
 
         }
