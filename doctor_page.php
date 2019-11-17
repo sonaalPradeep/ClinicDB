@@ -3,14 +3,9 @@
     if(!isset($_SESSION['doctor_id'])) {
         header('Location:doctor_login.php');
     }
-    if(!isset($_SESSION['count'])) {
-        $_SESSION['count'] = 0;
-        $_SESSION['flag'] = 0;
-    }
 ?>
 
 <!DOCTYPE html>
-
 <html>
 <head>
     <title>Doctor</title>
@@ -23,6 +18,8 @@
     <link href='select2.min.css' rel='stylesheet' type='text/css'>
 
 </head>
+
+
 <?php 
     $patient;
     
@@ -108,7 +105,6 @@
         $stmt->execute();
         $_SESSION['visitID'] = $conn->lastInsertId();
         
-        $_SESSION['count'] = 0;
         $conn = null;
         $_POST['patient_scan'] = null;
     }
@@ -120,7 +116,7 @@
         $password = 'root';
         
         $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         
         $quries = "INSERT INTO diagnosis(DocNotes, visID)
                         VALUES (:notes, :visID)";
@@ -141,8 +137,7 @@
 
         $med_names = [];
         $dosage = [];
-        $count = $_SESSION['count'];
-        
+        $count = $_POST['count'];
         $x = 0;
 
         while($x <= $count) {
@@ -198,15 +193,17 @@
         //         $stmt->execute();
         //     }
         // }
-        $test = $_POST['test_sel'];
-        print_r($test);
-        $quries = "INSERT INTO visitAndtest(visID, testID)
-                             VALUES (:visID, :testID)";
-        foreach($test as $val) {
-            $stmt = $conn->prepare($quries);
-            $stmt->bindParam(':visID', $_SESSION['visitID']);
-            $stmt->bindParam(':testID', $val);
-            $stmt->execute();
+        if(isset($_POST['test_sel'])) {
+            $test = $_POST['test_sel'];
+            // print_r($test);
+            $quries = "INSERT INTO visitAndtest(visID, testID)
+                                 VALUES (:visID, :testID)";
+            foreach($test as $val) {
+                $stmt = $conn->prepare($quries);
+                $stmt->bindParam(':visID', $_SESSION['visitID']);
+                $stmt->bindParam(':testID', $val);
+                $stmt->execute();
+            }
         }
     }
 ?>
@@ -256,7 +253,7 @@ $(document).ready(function(){
                                     </select>
                                 </td>
                                 <td>
-                                    <input type="number" name='dosage0' placeholder='Enter the number of days'>
+                                    <input type="number" name='dosage0' placeholder='Enter the number of days' required>
                                 </td>
                             </tr>
                         </tbody>
@@ -264,7 +261,7 @@ $(document).ready(function(){
                     <button background-color='#f1f1f1' class='add' type='button' onclick="myfunction()">Add</button>
                     
                 </div>
-
+                <input id = 'countt' type = 'hidden' name = 'count'>
                     
                 <label for="Reference"><b>Reference</b></label>
                 <textarea type="text" name="reference" placeholder="Enter the reference details" rows="10" columns="40"></textarea>
@@ -354,13 +351,11 @@ $(document).ready(function(){
         <?php endif; ?>
     </div>
     <script>
-        
+        var count = 0;
+        console.log(count);
         function myfunction() {
-            <?php 
-                $_SESSION['count']++;
-            ?>
-
-            var count = <?php echo $_SESSION['count']; ?>;
+            count = count + 1;
+            document.getElementById("countt").value = count;
             console.log(count);
             
             var med_n = <?php echo json_encode($medicine_names); ?>;
