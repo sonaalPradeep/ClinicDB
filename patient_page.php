@@ -31,7 +31,7 @@
 			die("Connection failed : ". mysqli_connect_error());
 		}
 		$id = $_SESSION['patient_id'];
-		
+
 		// Need to try to include ISNULL function to show if no medicines were given ISNULL(vpm.medicineName, 'N/A')
 		$sql2 = "SELECT V.DandT, D.firstName, dn.DocNotes, GROUP_CONCAT(vpm.medicineName)
 					FROM (((visit V INNER JOIN doctor D ON V.docID = D.doctorID)
@@ -50,10 +50,11 @@
 			}
 		}
 
-		$sql3 = "SELECT V.DandT, GROUP_CONCAT(t.testName) 
-					FROM ((visit V INNER JOIN visitAndtest vat ON V.visitID = vat.visID) 
+		$sql3 = "SELECT V.DandT, GROUP_CONCAT(t.testName)
+					FROM ((visit V INNER JOIN visitAndtest vat ON V.visitID = vat.visID)
 						INNER JOIN test t ON t.testID = vat.testID)
-					WHERE V.pID = $id 
+					WHERE V.pID = $id
+					GROUP BY V.DandT
 					ORDER BY DandT DESC";
 		$result3 = mysqli_query($conn, $sql3) or die(mysqli_error($conn));
 		$tests_cond = array();
@@ -68,13 +69,13 @@
 		}
 		$conn->close();
 
-		
+
 		$conn = mysqli_connect($servername, $username, $password, $dbname);
         // Check connection
         if (!$conn) {
             die("Connection failed: " . mysqli_connect_error());
         }
-		
+
 		$id = $_SESSION['patient_id'];
         $sql_new = "SELECT * FROM patient WHERE patientID = $id";
         $result = mysqli_query($conn, $sql_new);
@@ -89,9 +90,9 @@
 
 <script>
    var items= <?php echo json_encode($past_visits); ?>;
-   console.log(items[2]); // Output: Bear
+   // console.log(items[2]); // Output: Bear
    // OR
-   alert(items[0]); // Output: Apple
+   // alert(items[0]); // Output: Apple
 </script>
 
 <body>
@@ -100,13 +101,13 @@
 		<h1> Welcome to the Health Centre </h1>
 		<div class = 'user_space'>
 			<div id='patientDetails' class='patient_details'>
-				<?php 
+				<?php
 					if($patient):
 				?>
 				<h3>{{name}}</h3>
 				<h3>{{designation}}</h3>
 				<h3>{{contactno}}</h3>
-				<?php 
+				<?php
 					endif;
 				?>
 			</div>
@@ -115,14 +116,14 @@
 
 
 
-		<?php 
+		<?php
 			if(isset($past_visits)):
 		?>
 		<div class="topnav">
   			<a class="active" href="#home">Home</a>
   			<a class="logout" href="patient_login.php">Logout</a>
-		</div> 
-		
+		</div>
+
 		<div class = "patient_listing">
 			<h3><u>Diagnosis Details</u></h3>
 			<?php
@@ -163,17 +164,17 @@
 				}
 				echo '</table>';
 			?>
-		
+
 
 		</div>
-	<?php 
+	<?php
 			endif;
 	?>
 	</div>
 
-	<script>	
+	<script>
 		var test = <?php echo json_encode($patient); ?>;
-		
+
 		var val = test.firstName + " " + test.lastName;
 		console.log(val);
 		var pt = new Vue ({
@@ -181,10 +182,10 @@
 			data: {
 				name : val,
 				designation : test.Designation,
-				contactno : test.contactNo, 
+				contactno : test.contactNo,
 			},
 
-		});	
+		});
 
 	</script>
 </body>
